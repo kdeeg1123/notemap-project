@@ -1,53 +1,48 @@
 class Note
   attr_accessor :name, :accidental, :octave, :sortValue
   def initialize(name, octave)
-    begin
-      if name =~ /^([a-g]{1})((es|is)*)$/
-        @name = $1
-        @accidental = $2
-        @octave = octave
-        @octave_num = ''
-        @sortValue = 0
-      else
-        raise ArgumentError, "Note name should be a valid musical note"
-      end
-    rescue Exception => e
-      e.message
-      # puts e
+    if name =~ /^([a-g]{1})((es|is)*)$/
+      @name = $1
+      @accidental = $2
+      @octave = octave
+      @octave_num = ''
+      @sortValue = 0
     end
   end
 
   def core_note_value
     case @name
     when 'c'
-      1
+      1.0
     when 'd'
-      2
+      2.0
     when 'e'
-      3
+      3.0
     when 'f'
-      4
+      4.0
     when 'g'
-      5
+      5.0
     when 'a'
-      6
+      6.0
     when 'b'
-      7
+      7.0
     else
-    puts "Invalid note name - Need to throw exception here"
-    0
+      #puts "Invalid note name - Need to throw exception here"
+      0
     end
   end
 
   def sort_value
     case @accidental
     when /(es)+/
-      n = @accidental.scan(/(es)+/).size
-      @sortValue = core_note_value - (1 - (1.0 / (2 ^ n)))
+      #n = @accidental.scan(/(es)+/).size
+      n = @accidental.size / 2.0
+      @sortValue = core_note_value - (1 - (1.0 / (2**n)))
     # puts "Flat: #{@accidental}; SortValue = #{@sortValue}"
     when /(is)+/
-      n = @accidental.scan(/(is)+/).size
-      @sortValue = core_note_value + (1 - (1.0 / (2 ^ n)))
+      #n = @accidental.scan(/(is)+/).size
+      n = @accidental.size / 2.0
+      @sortValue = core_note_value + (1 - (1.0 / (2**n)))
     # puts "Sharp: #{@accidental}"
     else
     @sortValue = core_note_value
