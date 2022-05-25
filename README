@@ -1,0 +1,6 @@
+Uses: To create a map of all notes used in a lilypond score
+
+
+RSpec: To run specific test, in a terminal execute `rspec spec/<rspec_filename>.rb`
+
+
