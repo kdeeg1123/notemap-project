@@ -37,12 +37,12 @@ class Note
     when /(es)+/
       #n = @accidental.scan(/(es)+/).size
       n = @accidental.size / 2.0
-      @sortValue = core_note_value - (1 - (1.0 / (2**n)))
+      @sortValue = core_note_value - (n * (1.0 / 2))
     # puts "Flat: #{@accidental}; SortValue = #{@sortValue}"
     when /(is)+/
       #n = @accidental.scan(/(is)+/).size
       n = @accidental.size / 2.0
-      @sortValue = core_note_value + (1 - (1.0 / (2**n)))
+      @sortValue = core_note_value + (n * (1.0 / 2))
     # puts "Sharp: #{@accidental}"
     else
     @sortValue = core_note_value

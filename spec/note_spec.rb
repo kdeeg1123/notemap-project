@@ -85,5 +85,14 @@ describe Note do
       end
     end
   end
+  
+  describe ".sort_value" do
+    context "given quadruple FLAT note: feseseses" do
+      let(:note) { Note.new('feseseses', ",") }
+      it "returns 2.0" do
+        expect(note.sort_value).to eq(2.0)
+      end
+    end
+  end
 end
 
