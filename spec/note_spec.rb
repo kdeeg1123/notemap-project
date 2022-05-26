@@ -96,3 +96,13 @@ describe Note do
   end
 end
 
+describe Note do
+  describe ".sort_octave" do
+    context "given note: a" do
+      let(:note) { Note.new('a', '') }
+      it "returns octave 4" do
+        expect(note.sort_octave).to eq('4')
+      end
+    end
+  end
+end

@@ -35,18 +35,34 @@ class Note
   def sort_value
     case @accidental
     when /(es)+/
-      #n = @accidental.scan(/(es)+/).size
       n = @accidental.size / 2.0
       @sortValue = core_note_value - (n * (1.0 / 2))
-    # puts "Flat: #{@accidental}; SortValue = #{@sortValue}"
     when /(is)+/
-      #n = @accidental.scan(/(is)+/).size
       n = @accidental.size / 2.0
       @sortValue = core_note_value + (n * (1.0 / 2))
-    # puts "Sharp: #{@accidental}"
     else
     @sortValue = core_note_value
-    # puts "put the default value of the core note here"
+    end
+  end
+  
+  def sort_octave
+    case @octave
+    when ',,'
+      @octave_num = '2'
+    when ','
+      @octave_num = '3'
+    when '\''
+      @octave_num = '5'
+    when '\'\''
+      @octave_num = '6'
+    when '\'\'\''
+      @octave_num = '7'
+    when '\'\'\'\''
+      @octave_num = '8'
+    when '\'\'\'\'\''
+      @octave_num = '9'
+    else
+      @octave_num = '4'
     end
   end
 end
