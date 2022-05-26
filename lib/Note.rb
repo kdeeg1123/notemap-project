@@ -1,17 +1,17 @@
 class Note
-  attr_accessor :name, :accidental, :octave, :sortValue
+  attr_accessor :name, :accidental, :octave, :octaveSortValue, :sortValue
   def initialize(name, octave)
     if name =~ /^([a-g]{1})((es|is)*)$/
       @name = $1
       @accidental = $2
       @octave = octave
-      @octave_num = ''
+      @octaveSortValue = 0
       @sortValue = 0
     end
   end
 
   def core_note_value
-    case @name
+    case self.name
     when 'c'
       1.0
     when 'd'
@@ -33,36 +33,42 @@ class Note
   end
 
   def sort_value
+    self.sort_octave
     case @accidental
     when /(es)+/
       n = @accidental.size / 2.0
-      @sortValue = core_note_value - (n * (1.0 / 2))
+      @sortValue = @octaveSortValue + (self.core_note_value - n * (1.0 / 2))
     when /(is)+/
       n = @accidental.size / 2.0
-      @sortValue = core_note_value + (n * (1.0 / 2))
+      @sortValue = @octaveSortValue + (self.core_note_value + n * (1.0 / 2))
     else
-    @sortValue = core_note_value
+    @sortValue = @octaveSortValue + self.core_note_value
     end
   end
   
+  # Orders the note value based on octave in increments of 10.
+  # Negative (-) values are bass notes, positive (+) values are treble notes
+  # 
+  # == Returns:
+  #  Sets the @octave instance parameter for a specified note
   def sort_octave
     case @octave
     when ',,'
-      @octave_num = '2'
+      @octaveSortValue = -30
     when ','
-      @octave_num = '3'
+      @octaveSortValue = -20
     when '\''
-      @octave_num = '5'
+      @octaveSortValue = 0
     when '\'\''
-      @octave_num = '6'
+      @octaveSortValue = 10
     when '\'\'\''
-      @octave_num = '7'
+      @octaveSortValue = 20
     when '\'\'\'\''
-      @octave_num = '8'
+      @octaveSortValue = 30
     when '\'\'\'\'\''
-      @octave_num = '9'
+      @octaveSortValue = 40
     else
-      @octave_num = '4'
+      @octaveSortValue = -10
     end
   end
 end
