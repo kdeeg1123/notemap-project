@@ -1,12 +1,25 @@
+require_relative './NoteExceptions'
+
 class Note
-  attr_accessor :name, :accidental, :octave, :octaveSortValue, :sortValue
+  attr_accessor :name, :accidental, :instrument, :octave, :octaveSortValue, :sortValue
+  
+  # Creates a Note object
+  # @param name [String] the note name (a-g) with any corresponding alteration (flat(s)/sharp(s))
+  # @param octave [String] the lilypond octave designation by comma (,), single quote ('), or nothing
+  # @param accidental [String] the lilypond accidental designation: (es)+ for flats or (is)+ for sharps
+  # @param instrument [String] indicating whether the note is handbell or chime
+  # @param octaveSortValue [Float] numerical value to indicate corresponding handbell octave
+  # @param sortValue [Float] numerical value for overall sorting purposes
   def initialize(name, octave)
     if name =~ /^([a-g]{1})((es|is)*)$/
       @name = $1
       @accidental = $2
+      @instrument = ''
       @octave = octave
       @octaveSortValue = 0
       @sortValue = 0
+    else
+      raise NoteException.new("Invalid note creation attempted: '#{name}'")
     end
   end
 
@@ -27,8 +40,7 @@ class Note
     when 'b'
       7.0
     else
-      #puts "Invalid note name - Need to throw exception here"
-      0
+      raise NoteException.new("Invalid note name. Input must be a valid note (a-g)")
     end
   end
 
@@ -47,61 +59,38 @@ class Note
   end
   
   # Orders the note value based on octave in increments of 10.
-  # Negative (-) values are bass notes, positive (+) values are treble notes
+  # octaveSortValue <= 50 (Bass notes)
+  # octaveSortValue >  50 (Treble notes)
+  # ',,,,' is the lowest handbell note in existence (G0)
   # 
   # == Returns:
   #  Sets the @octave instance parameter for a specified note
   def sort_octave
     case @octave
-    when ',,'
-      @octaveSortValue = -30
-    when ','
-      @octaveSortValue = -20
-    when '\''
+    when ',,,,'
       @octaveSortValue = 0
-    when '\'\''
+    when ',,,'
       @octaveSortValue = 10
-    when '\'\'\''
+    when ',,'
       @octaveSortValue = 20
-    when '\'\'\'\''
+    when ','
       @octaveSortValue = 30
-    when '\'\'\'\'\''
+    when ''
       @octaveSortValue = 40
+    when '\''
+      @octaveSortValue = 50
+    when '\'\''
+      @octaveSortValue = 60
+    when '\'\'\''
+      @octaveSortValue = 70
+    when '\'\'\'\''
+      @octaveSortValue = 80
+    when '\'\'\'\'\''
+      @octaveSortValue = 90
     else
-      @octaveSortValue = -10
+      # Throw exception for invalid octave identification
+      raise NoteException.new("Invalid octave identification. Must be either single quote ('), comma (,), or nothing")
     end
   end
 end
-
-NOTE_DICTIONARY = [
-  Note.new("c", ",")
-]
-
-NOTE_SORT = [
-  # C3 - B3:
-  Note.new("ces,", 3), Note.new("c,", 3), Note.new("cis,", 3), Note.new("des,", 3), Note.new("d,", 3), Note.new("dis,", 3),
-  Note.new("ees,", 3), Note.new("e,", 3), Note.new("eis,", 3), Note.new("fes,", 3), Note.new("f,", 3), Note.new("fis,", 3),
-  Note.new("ges,", 3), Note.new("g,", 3), Note.new("gis,", 3), Note.new("aes,", 3), Note.new("a,", 3), Note.new("ais,", 3),
-  Note.new("bes,", 3), Note.new("b,", 3), Note.new("bis,", 3),
-  # C4 - B4:
-  Note.new("ces", 4), Note.new("c", 4), Note.new("cis", 4), Note.new("des", 4), Note.new("d", 4), Note.new("dis", 4),
-  Note.new("ees", 4), Note.new("e", 4), Note.new("eis", 4), Note.new("fes", 4), Note.new("f", 4), Note.new("fis", 4),
-  Note.new("ges", 4), Note.new("g", 4), Note.new("gis", 4), Note.new("aes", 4), Note.new("a", 4), Note.new("ais", 4),
-  Note.new("bes", 4), Note.new("b", 4), Note.new("bis", 4),
-  # C5 - B5:
-  Note.new("ces'", 5), Note.new("c'", 5), Note.new("cis'", 5), Note.new("des'", 5), Note.new("d'", 5), Note.new("dis'", 5),
-  Note.new("ees'", 5), Note.new("e'", 5), Note.new("eis'", 5), Note.new("fes'", 5), Note.new("f'", 5), Note.new("fis'", 5),
-  Note.new("ges'", 5), Note.new("g'", 5), Note.new("gis'", 5), Note.new("aes'", 5), Note.new("a'", 5), Note.new("ais'", 5),
-  Note.new("bes'", 5), Note.new("b'", 5), Note.new("bis'", 5),
-  # C6 - B6:
-  Note.new("ces''", 6), Note.new("c''", 6), Note.new("cis''", 6), Note.new("des''", 6), Note.new("d''", 6), Note.new("dis''", 6),
-  Note.new("ees''", 6), Note.new("e''", 6), Note.new("eis''", 6), Note.new("fes''", 6), Note.new("f''", 6), Note.new("fis''", 6),
-  Note.new("ges''", 6), Note.new("g''", 6), Note.new("gis''", 6), Note.new("aes''", 6), Note.new("a''", 6), Note.new("ais''", 6),
-  Note.new("bes''", 6), Note.new("b''", 6), Note.new("bis''", 6),
-  # C7 - B7:
-  Note.new("ces'''", 7), Note.new("c'''", 7), Note.new("cis'''", 7), Note.new("des'''", 7), Note.new("d'''", 7), Note.new("dis'''", 7),
-  Note.new("ees'''", 7), Note.new("e'''", 7), Note.new("eis'''", 7), Note.new("fes'''", 7), Note.new("f'''", 7), Note.new("fis'''", 7),
-  Note.new("ges'''", 7), Note.new("g'''", 7), Note.new("gis'''", 7), Note.new("aes'''", 7), Note.new("a'''", 7), Note.new("ais'''", 7),
-  Note.new("bes'''", 7), Note.new("b'''", 7), Note.new("bis'''", 7)
-]
 

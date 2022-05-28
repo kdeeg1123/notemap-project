@@ -54,7 +54,9 @@ describe Note do
     context "given an invalid note name 'w'" do
       let(:note) { Note.new('w', '') }
       it "returns an error" do
-        expect(note.core_note_value()).to eq(0)
+#        expect(note.core_note_value()).to eq(0)
+        expect {note.core_note_value() }.to raise_error(NoteException)
+#        expect { response }.to raise_error(Errors::CarBrandNotFound)
       end
     end
   end
@@ -62,61 +64,89 @@ describe Note do
   describe ".sort_value without unique octave" do
     context "given FLAT note: aes" do
       let(:note) { Note.new('aes', '') }
-      it "returns -4.5" do
-        expect(note.sort_value).to eq(-4.5)
+      it "returns 45.5" do
+        expect(note.sort_value).to eq(45.5)
       end
     end
   
     context "given SHARP note: fis" do
       let(:note) { Note.new('fis', '') }
-      it "returns -5.5" do
-        expect(note.sort_value).to eq(-5.5)
+      it "returns 44.5" do
+        expect(note.sort_value).to eq(44.5)
       end
     end
   
     context "given double SHARP note: cisis" do
       let(:note) { Note.new('cisis', '') }
-      it "returns -8.0" do
-        expect(note.sort_value).to eq(-8.0)
+      it "returns 42.0" do
+        expect(note.sort_value).to eq(42.0)
       end
     end
   
     context "given quadruple FLAT note: feseseses" do
       let(:note) { Note.new('feseseses', "") }
-      it "returns -8.0" do
-        expect(note.sort_value).to eq(-8.0)
+      it "returns 42.0" do
+        expect(note.sort_value).to eq(42.0)
       end
     end
   end
-end
-
-describe Note do
+  
   describe ".sort_value with unique octave" do
     context "given note with octave designation a'" do
       let(:note) { Note.new('a', '\'') }
-      it "returns octave 4" do
-        expect(note.sort_octave).to eq(0)
+      it "returns octave 50" do
+        expect(note.sort_octave).to eq(50)
       end
     end
     
     context "given note with octave designation a" do
       let(:note) { Note.new('a', '') }
-      it "sets the octave value as -10" do
-        expect(note.sort_octave).to eq(-10)
+      it "sets the octave value as 40" do
+        expect(note.sort_octave).to eq(40)
       end
     end
     
     context "given note with octave designation a," do
       let(:note) { Note.new('a', ',') }
-      it "returns octave 4" do
-        expect(note.sort_octave).to eq(-20)
+      it "returns octave 30" do
+        expect(note.sort_octave).to eq(30)
       end
     end
     
     context "given note with octave designation a,," do
       let(:note) { Note.new('a', ',,') }
-      it "returns octave 4" do
-        expect(note.sort_octave).to eq(-30)
+      it "returns octave 20" do
+        expect(note.sort_octave).to eq(20)
+      end
+    end
+  end
+  
+  describe ".in_clef" do
+    context "given note aes,," do
+      let(:note) { Note.new('aes', ',,') }
+      it "returns as bass clef" do
+        expect(note.in_clef).to eq('bass')
+      end
+    end
+    
+    context "given note e''" do
+      let(:note) { Note.new('e', "''") }
+      it "returns as treble clef" do
+        expect(note.in_clef).to eq('treble')
+      end
+    end
+    
+    context "given note c'" do
+      let(:note) { Note.new('c', "'") }
+      it "returns as bass clef" do
+        expect(note.in_clef).to eq('bass')
+      end
+    end
+    
+    context "given note des'" do
+      let(:note) { Note.new('des', "'") }
+      it "returns as treble clef" do
+        expect(note.in_clef).to eq('treble')
       end
     end
   end
