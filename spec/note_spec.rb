@@ -54,9 +54,7 @@ describe Note do
     context "given an invalid note name 'w'" do
       let(:note) { Note.new('w', '') }
       it "returns an error" do
-#        expect(note.core_note_value()).to eq(0)
         expect {note.core_note_value() }.to raise_error(NoteException)
-#        expect { response }.to raise_error(Errors::CarBrandNotFound)
       end
     end
   end
@@ -145,6 +143,20 @@ describe Note do
     
     context "given note des'" do
       let(:note) { Note.new('des', "'") }
+      it "returns as treble clef" do
+        expect(note.in_clef).to eq('treble')
+      end
+    end
+    
+    context "given note deses'" do
+      let(:note) { Note.new('deses', "'") }
+      it "returns as bass clef" do
+        expect(note.in_clef).to eq('bass')
+      end
+    end
+    
+    context "given note bisis" do
+      let(:note) { Note.new('bisis', '') }
       it "returns as treble clef" do
         expect(note.in_clef).to eq('treble')
       end

@@ -1,8 +1,9 @@
-require_relative './NoteExceptions'
+require_relative 'NoteExceptions'
+require_relative 'helpers/note_helper'
 
+include NoteHelper
 class Note
   attr_accessor :name, :accidental, :instrument, :octave, :octaveSortValue, :sortValue
-  
   # Creates a Note object
   # @param name [String] the note name (a-g) with any corresponding alteration (flat(s)/sharp(s))
   # @param octave [String] the lilypond octave designation by comma (,), single quote ('), or nothing
@@ -18,28 +19,16 @@ class Note
       @octave = octave
       @octaveSortValue = 0
       @sortValue = 0
+      @frequency = 0.0
     else
       raise NoteException.new("Invalid note creation attempted: '#{name}'")
     end
   end
 
   def core_note_value
-    case self.name
-    when 'c'
-      1.0
-    when 'd'
-      2.0
-    when 'e'
-      3.0
-    when 'f'
-      4.0
-    when 'g'
-      5.0
-    when 'a'
-      6.0
-    when 'b'
-      7.0
-    else
+    begin
+      NoteHelper::NOTE_DEFINITION_ORDER.find_index(self.name.upcase)
+    rescue
       raise NoteException.new("Invalid note name. Input must be a valid note (a-g)")
     end
   end
@@ -57,39 +46,84 @@ class Note
     @sortValue = @octaveSortValue + self.core_note_value
     end
   end
-  
+
   # Orders the note value based on octave in increments of 10.
   # octaveSortValue <= 50 (Bass notes)
   # octaveSortValue >  50 (Treble notes)
   # ',,,,' is the lowest handbell note in existence (G0)
-  # 
+  #
   # == Returns:
   #  Sets the @octave instance parameter for a specified note
   def sort_octave
     case @octave
-    when ',,,,'
-      @octaveSortValue = 0
     when ',,,'
-      @octaveSortValue = 10
+      @octaveSortValue = 0
     when ',,'
-      @octaveSortValue = 20
+      @octaveSortValue = 1
     when ','
-      @octaveSortValue = 30
+      @octaveSortValue = 2
     when ''
-      @octaveSortValue = 40
+      @octaveSortValue = 3
     when '\''
-      @octaveSortValue = 50
+      @octaveSortValue = 4
     when '\'\''
-      @octaveSortValue = 60
+      @octaveSortValue = 5
     when '\'\'\''
-      @octaveSortValue = 70
+      @octaveSortValue = 6
     when '\'\'\'\''
-      @octaveSortValue = 80
+      @octaveSortValue = 7
     when '\'\'\'\'\''
-      @octaveSortValue = 90
+      @octaveSortValue = 8
+    when '\'\'\'\'\'\''
+      @octaveSortValue = 9
     else
-      # Throw exception for invalid octave identification
-      raise NoteException.new("Invalid octave identification. Must be either single quote ('), comma (,), or nothing")
+    # Throw exception for invalid octave identification
+    raise NoteException.new("Invalid octave identification. Must be either single quote ('), comma (,), or nothing")
+    end
+  end
+  
+  # Gets and returns the physical frequency of the note indicated.
+  # @param coreNoteValue [Float] is the coreNoteValue of the wanted frequency from the Note.core_note_value method
+  # @param accidentals [String] the list of accidentals (i.e. 'es+' or 'is+')
+  # @param octaveSortValue [Int] is the octaveSortValue from the Note.sort_octave method
+  #
+  # == Returns:
+  #  frequency [Float] the physical frequency of the specified note
+  def find_frequency
+    case @accidental
+    when /(es)+/
+      accidentalSize = accidentals.size / -2.0
+    when /(is)+/
+      accidentalSize = accidentals.size / 2.0
+    else
+    accidentalSize = 0
+    end
+
+    enharmonicValue = (self.core_note_value + accidentalSize) % 12
+    # enharmonicNote = NoteHelper::NOTE_DEFINITION_ORDER[enharmonicValue]
+    distanceFromA = enharmonicValue - NoteHelper::NOTE_DEFINITION_ORDER.find_index('A')
+
+    @frequency = (NoteHelper::FREQUENCY_OF_A_IN_OCTAVE[@octaveSortValue] * (2.0 ** (distanceFromA / 12.0))).round(2)
+    @frequency
+  end
+
+  # Defines which clef the note resides (currently not supporting multi-sharp/flats across the staves)
+  #
+  # == Returns:
+  #  'treble' OR 'bass' depending on @sortValue
+  def in_clef
+    self.sort_value
+
+    # Get number of accidentals
+    accidentalCount = @accidental.size / 2
+
+    if self.sort_octave < 50
+
+    end
+    if @sortValue > 51.0
+      'treble'
+    else
+      'bass'
     end
   end
 end
