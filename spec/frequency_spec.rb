@@ -5,7 +5,8 @@ describe Note do
     let(:note) { note = Note.new('a', '') }
     it "has a frequency of 220.0 Hz" do
       note.sort_octave
-      expect(note.find_frequency).to eq(220.00)
+      note.find_frequency
+      expect(note.frequency).to eq(220.00)
     end
   end
 
@@ -13,7 +14,8 @@ describe Note do
     let(:note) { note = Note.new('b', '') }
     it "has a frequency of 246.94 Hz" do
       note.sort_octave
-      expect(note.find_frequency).to eq(246.94)
+      note.find_frequency
+      expect(note.frequency).to eq(246.94)
     end
   end
 
@@ -21,7 +23,8 @@ describe Note do
     let(:note) { note = Note.new('f', "'") }
     it "has a frequency of 349.23 Hz" do
       note.sort_octave
-      expect(note.find_frequency).to eq(349.23)
+      note.find_frequency
+      expect(note.frequency).to eq(349.23)
     end
   end
 end

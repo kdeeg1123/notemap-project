@@ -3,23 +3,24 @@ require_relative 'helpers/note_helper'
 
 include NoteHelper
 class Note
-  attr_accessor :name, :accidental, :instrument, :octave, :octaveSortValue, :sortValue
+  attr_accessor :instrument, :octaveSortValue
+  attr_reader :name, :accidental, :frequency, :octave, :octaveSortValue
+  
   # Creates a Note object
   # @param name [String] the note name (a-g) with any corresponding alteration (flat(s)/sharp(s))
   # @param octave [String] the lilypond octave designation by comma (,), single quote ('), or nothing
-  # @param accidental [String] the lilypond accidental designation: (es)+ for flats or (is)+ for sharps
-  # @param instrument [String] indicating whether the note is handbell or chime
-  # @param octaveSortValue [Float] numerical value to indicate corresponding handbell octave
-  # @param sortValue [Float] numerical value for overall sorting purposes
+  # @param accidental [String <Optional>] the lilypond accidental designation: (es)+ for flats or (is)+ for sharps
+  # @param instrument [String <Optional>] indicating whether the note is handbell or chime
+  # @param octaveSortValue [Float <Optional>] numerical value to indicate corresponding handbell octave
+  # @param sortValue [Float <Optional>] numerical value for overall sorting purposes
   def initialize(name, octave)
     if name =~ /^([a-g]{1})((es|is)*)$/
       @name = $1
       @accidental = $2
       @instrument = ''
       @octave = octave
-      @octaveSortValue = 0
-      @sortValue = 0
-      @frequency = 0.0
+      @octaveSortValue = self.sort_octave
+      @frequency = self.find_frequency
     else
       raise NoteException.new("Invalid note creation attempted: '#{name}'")
     end
@@ -30,20 +31,6 @@ class Note
       NoteHelper::NOTE_DEFINITION_ORDER.find_index(self.name.upcase)
     rescue
       raise NoteException.new("Invalid note name. Input must be a valid note (a-g)")
-    end
-  end
-
-  def sort_value
-    self.sort_octave
-    case @accidental
-    when /(es)+/
-      n = @accidental.size / 2.0
-      @sortValue = @octaveSortValue + (self.core_note_value - n * (1.0 / 2))
-    when /(is)+/
-      n = @accidental.size / 2.0
-      @sortValue = @octaveSortValue + (self.core_note_value + n * (1.0 / 2))
-    else
-    @sortValue = @octaveSortValue + self.core_note_value
     end
   end
 
@@ -81,30 +68,33 @@ class Note
     raise NoteException.new("Invalid octave identification. Must be either single quote ('), comma (,), or nothing")
     end
   end
-  
-  # Gets and returns the physical frequency of the note indicated.
-  # @param coreNoteValue [Float] is the coreNoteValue of the wanted frequency from the Note.core_note_value method
-  # @param accidentals [String] the list of accidentals (i.e. 'es+' or 'is+')
-  # @param octaveSortValue [Int] is the octaveSortValue from the Note.sort_octave method
+
+  # Sets the physical frequency of the note indicated as an instance variable.
   #
-  # == Returns:
+  # == Sets:
   #  frequency [Float] the physical frequency of the specified note
   def find_frequency
     case @accidental
     when /(es)+/
-      accidentalSize = accidentals.size / -2.0
+      accidentalSize = @accidental.size / -2.0
     when /(is)+/
-      accidentalSize = accidentals.size / 2.0
+      accidentalSize = @accidental.size / 2.0
     else
     accidentalSize = 0
     end
 
-    enharmonicValue = (self.core_note_value + accidentalSize) % 12
+    actualNoteValue = self.core_note_value + accidentalSize
+    if actualNoteValue < 0
+      @octaveSortValue = @octaveSortValue - 1
+    elsif actualNoteValue >= 12
+      @octaveSortValue = @octaveSortValue + 1
+    end
+    enharmonicValue = actualNoteValue % 12
+    
     # enharmonicNote = NoteHelper::NOTE_DEFINITION_ORDER[enharmonicValue]
     distanceFromA = enharmonicValue - NoteHelper::NOTE_DEFINITION_ORDER.find_index('A')
 
     @frequency = (NoteHelper::FREQUENCY_OF_A_IN_OCTAVE[@octaveSortValue] * (2.0 ** (distanceFromA / 12.0))).round(2)
-    @frequency
   end
 
   # Defines which clef the note resides (currently not supporting multi-sharp/flats across the staves)
@@ -112,18 +102,11 @@ class Note
   # == Returns:
   #  'treble' OR 'bass' depending on @sortValue
   def in_clef
-    self.sort_value
-
     # Get number of accidentals
-    accidentalCount = @accidental.size / 2
-
-    if self.sort_octave < 50
-
-    end
-    if @sortValue > 51.0
-      'treble'
-    else
+    if @frequency < 270.00
       'bass'
+    else
+      'treble'
     end
   end
 end
