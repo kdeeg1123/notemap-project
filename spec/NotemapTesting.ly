@@ -29,7 +29,9 @@
       \new Staff = "treble" {
         \key c \major
         \absolute {
-          d'4 e' f' g' a' b' c'' d'' e'' f'' g'' a'' b'' c'''
+          d'4 e' f' g' a' b'
+          c'' d'' e'' f'' g'' a'' b''
+          c'''
         }
       }
       
@@ -38,7 +40,9 @@
         \clef bass
         \absolute {
           % Bass goes here
-          c,4 d,4 e,4 f,4 g,4 a,4 b,4 c4 d4 e4 f g a b c'
+          c,4 d,4 e,4 f,4 g,4 a,4 b,4
+          c4 d4 e4 f g a b
+          c'
         }
       }
     >>

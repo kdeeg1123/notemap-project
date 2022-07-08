@@ -33,7 +33,6 @@ module NoteHelper
   end
   
   def print_formatted_array(array)
-    puts "Notes Used:"
     array.each_with_index do |e, i|
       if i < array.size - 1
         print "#{array[i]} "
@@ -42,4 +41,43 @@ module NoteHelper
       end
     end
   end
+  
+  def print_lilypond_format(noteArray)
+    trebleArray = Array.new
+    bassArray = Array.new
+    
+    noteArray.each do |note|
+      if note.in_clef == 'treble'
+        trebleArray << note
+      else
+        bassArray << note
+      end
+    end
+    
+    trebleArray = sort_notes_in_array trebleArray
+    bassArray = sort_notes_in_array bassArray
+    
+    puts '\score {'
+    puts '  \new StaffGroup'
+    puts '  <<'
+    puts '    \cadenzaOff'
+    puts '    \new Staff = "upper" {'
+    puts '      \key c \major'
+    puts '      \hide Stem'
+    print '      '
+    print_formatted_array trebleArray
+    puts '      \undo \hide Stem'
+    puts '    }'
+    puts '    \new Staff = "lower" {'
+    puts '      \key c \major'
+    puts '      \hide Stem'
+    print '      '
+    print_formatted_array bassArray
+    puts '      \undo \hide Stem'
+    puts '    }'
+    puts '    \cadenzaOn'
+    puts '  >>'
+    puts '}'
+  end
 end
+

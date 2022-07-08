@@ -47,4 +47,30 @@ describe Note do
       expect(NoteHelper::sort_notes_in_array(objectArray)).to eq(expectedResult)
     end
   end
+  
+  describe "sort notes mixed across clef ()" do
+    let(:note) { note = Note.new('a', '') }
+    it "can be sorted into a sorted list: " do
+      n10 = Note.new('b', ',')
+      n13 = Note.new('c', '')
+      n12 = Note.new('cis', '')
+      n14 = Note.new('d', '')
+      n15 = Note.new('e', '')
+      n16 = Note.new('fis', '')
+      n17 = Note.new('g', '')
+      n8 = Note.new('a', '')
+      n9 = Note.new('b', '')
+      n11 = Note.new('c', "'")
+      n1 = Note.new('cis', "'")
+      n2 = Note.new('d', "'")
+      n3 = Note.new('dis', "'")
+      n4 = Note.new('e', "'")
+      n5 = Note.new('f', "'")
+      n6 = Note.new('fis', "'")
+      n7 = Note.new('g', "'")
+      objectArray = [n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17]
+      expectedResult = ["b,", "c", "cis", "d", "e", "fis", "g", "a", "b", "c'", "cis'", "d'", "dis'", "e'", "f'", "fis'", "g'"]
+      expect(NoteHelper::sort_notes_in_array(objectArray)).to eq(expectedResult)
+    end
+  end
 end

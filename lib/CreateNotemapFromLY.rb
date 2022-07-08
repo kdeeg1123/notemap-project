@@ -5,8 +5,8 @@ require_relative 'helpers/note_helper'
 options = {}
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: ruby CreateNotemapFromLY.rb <lilypond_file.ly> [options]"
-  opts.on("-f", "--file [FILE]", String, "Lilypond file") do |f|
-    options[:file] = f
+  opts.on("-l", "--lyformat [FLAG]", TrueClass, "Print a format which can be dropped directly into a Lilypond file") do |l|
+    options[:lyformat] = l.nil? ? true : l
   end
   opts.on("-h", "--help", "Display this screen") do |h|
     puts opts
@@ -16,13 +16,11 @@ end.parse!
 
 begin
   optparse.parse!
-  compulsory = [:file]
-  missing = compulsory.select{ |param| options[param].nil? }
-  unless missing.empty?
-    raise OptionParser::MissingArgument.new(missing.join(', '))
-  end
   
-  file = options[:file]
+  raise ArgumentError.new("ArgumentError: wrong number of arguments (given #{ARGV.size}, expected 1)") if (ARGV.empty? || ARGV.size != 1)
+  
+  file = ARGV[0]
+  raise ArgumentError.new("ArgumentError: invalid filetype (given #{ARGV[0][/\.\w+/].upcase}, expected Lilypond file (.ly) )") if file !~ /.+\.ly$/
   
   begin
     noteArray = Array.new # array of all unique Note objects
@@ -47,10 +45,14 @@ begin
         end
       end
     end
-    NoteHelper::print_formatted_array(NoteHelper::sort_notes_in_array(noteArray))
+    if options[:lyformat]
+      NoteHelper::print_lilypond_format(noteArray)
+    else
+      NoteHelper::print_formatted_array(NoteHelper::sort_notes_in_array(noteArray))
+    end
   rescue 
-  puts $!
-  puts $!.backtrace.join("\n\t")
+    puts $!
+    puts $!.backtrace.join("\n\t")
   end
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument
   puts #!.to_s

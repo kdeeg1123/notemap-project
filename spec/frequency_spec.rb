@@ -27,4 +27,22 @@ describe Note do
       expect(note.frequency).to eq(349.23)
     end
   end
+  
+  describe "find_frequency_of (c)" do
+    let(:note) { note = Note.new('c', '') }
+    it "has a frequency of 130.81 Hz" do
+      note.sort_octave
+      note.find_frequency
+      expect(note.frequency).to eq(130.81)
+    end
+  end
+  
+  describe "find_frequency_of (c,)" do
+    let(:note) { note = Note.new('c', ',') }
+    it "has a frequency of 65.41 Hz" do
+      note.sort_octave
+      note.find_frequency
+      expect(note.frequency).to eq(65.41)
+    end
+  end
 end
