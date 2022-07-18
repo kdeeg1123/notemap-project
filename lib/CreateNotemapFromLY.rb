@@ -55,7 +55,7 @@ begin
     puts $!.backtrace.join("\n\t")
   end
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument
-  puts #!.to_s
+  puts $!.to_s
   puts optparse
 end
 

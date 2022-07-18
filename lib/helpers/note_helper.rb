@@ -57,27 +57,30 @@ module NoteHelper
     trebleArray = sort_notes_in_array trebleArray
     bassArray = sort_notes_in_array bassArray
     
-    puts '\score {'
-    puts '  \new StaffGroup'
-    puts '  <<'
-    puts '    \cadenzaOff'
-    puts '    \new Staff = "upper" {'
-    puts '      \key c \major'
-    puts '      \hide Stem'
-    print '      '
-    print_formatted_array trebleArray
-    puts '      \undo \hide Stem'
-    puts '    }'
-    puts '    \new Staff = "lower" {'
-    puts '      \key c \major'
-    puts '      \hide Stem'
-    print '      '
-    print_formatted_array bassArray
-    puts '      \undo \hide Stem'
-    puts '    }'
-    puts '    \cadenzaOn'
-    puts '  >>'
-    puts '}'
+    # outputFile = File.new('LilypondFormat.txt')
+    File.open('LilypondFormat.txt', "w+") do |f|
+    f.puts '\score {'
+    f.puts '  \new StaffGroup'
+    f.puts '  <<'
+    f.puts '    \cadenzaOff'
+    f.puts '    \new Staff = "upper" {'
+    f.puts '      \key c \major'
+    f.puts '      \hide Stem'
+    f.print '      '
+    f.print_formatted_array trebleArray
+    f.puts '      \undo \hide Stem'
+    f.puts '    }'
+    f.puts '    \new Staff = "lower" {'
+    f.puts '      \key c \major'
+    f.puts '      \hide Stem'
+    f.print '      '
+    f.print_formatted_array bassArray
+    f.puts '      \undo \hide Stem'
+    f.puts '    }'
+    f.puts '    \cadenzaOn'
+    f.puts '  >>'
+    f.puts '}'
+    end
   end
 end
 

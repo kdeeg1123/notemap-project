@@ -1,0 +1,19 @@
+\score {
+  \new StaffGroup
+  <<
+    \cadenzaOff
+    \new Staff = "upper" {
+      \key c \major
+      \hide Stem
+      d' e' f' g' a' b' c'' d'' e'' f'' g'' a'' b'' c'''
+      \undo \hide Stem
+    }
+    \new Staff = "lower" {
+      \key c \major
+      \hide Stem
+      c, d, e, f, g, a, b, c d e f g a b c'
+      \undo \hide Stem
+    }
+    \cadenzaOn
+  >>
+}
