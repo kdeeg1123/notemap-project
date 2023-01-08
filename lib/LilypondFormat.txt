@@ -5,13 +5,13 @@
     \new Staff = "upper" {
       \key c \major
       \hide Stem
-      d' e' f' g' a' b' c'' d'' e'' f'' g'' a'' b'' c'''
+      d' e' f' g' a' bes' c'' d'' e'' f'' g'' bes'' c'''
       \undo \hide Stem
     }
     \new Staff = "lower" {
       \key c \major
       \hide Stem
-      c, d, e, f, g, a, b, c d e f g a b c'
+      c, f, g, a, bes, c d e f g a bes c'
       \undo \hide Stem
     }
     \cadenzaOn
