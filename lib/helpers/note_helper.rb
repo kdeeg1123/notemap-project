@@ -72,7 +72,7 @@ module NoteHelper
     f.puts '    }'
     f.puts '    \new Staff = "lower" {'
     f.puts '      \key c \major'
-    f.puts '      \clef "bass"'
+    f.puts '      \clef bass'
     f.puts '      \hide Stem'
     f.print '      '
     f.print_formatted_array bassArray
